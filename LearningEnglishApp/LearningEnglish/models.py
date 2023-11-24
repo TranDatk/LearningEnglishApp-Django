@@ -32,7 +32,14 @@ class Question(models.Model):
     sd_answer = models.CharField(max_length=255,null=True)
     td_answer = models.CharField(max_length=255, null=True)
     fh_answer = models.CharField(max_length=255,null=True)
-    correct_answer = models.CharField(max_length=255,null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    correct_answer = models.IntegerField(null=True)
+    fk_lesson = models.ForeignKey('Lesson', on_delete=models.SET_NULL, null=True, related_name="questions")
+
+    def __str__(self):
+        return self.content
 
 class Category(ItemBase):
     class Meta:
@@ -64,26 +71,28 @@ class Word(ItemBase):
     spelling = models.CharField(max_length=255, null=True, blank=True, unique=True)
     sound = models.FileField(default=None, blank=True, null=True, upload_to='words_sound/%Y/%m')
     example = models.TextField(null=True, blank=True)
-    fk_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="words")
+
 
 class Grammar(ItemBase):
     class Meta:
         db_table = 'grammar'
     recipe = models.CharField(max_length=255,null=True, blank=True)
     example = models.TextField(null=True, blank=True)
-    fk_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True,related_name="grammars")
+    fk_title_grammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, related_name="grammars")
 
 class Listen(ItemBase):
     class Meta:
         db_table = 'listen'
     sound = models.FileField(default=None, blank=True, null=True, upload_to='listening_file/%Y/%m')
-    fk_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="listens")
 
 class Reading(ItemBase):
     class Meta:
         db_table = 'reading'
     paragraph = models.TextField(null=True, blank=True)
-    fk_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="readings")
+
+class TitleGrammar(ItemBase):
+    class Meta:
+        db_table = 'titlegrammar'
 
 class Lesson_Category_WLRG(models.Model):
     class Meta:
@@ -92,3 +101,7 @@ class Lesson_Category_WLRG(models.Model):
     id_WLRG = models.IntegerField(null=False)
     fk_Lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
     fk_Category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
+
+    def __str__(self):
+        return "Id: " + str(self.id_WLRG) + " - Lesson: " + str(self.fk_Lesson) \
+               + " - Category: " + str(self.fk_Category)
