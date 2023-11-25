@@ -63,7 +63,6 @@ class Lesson(ItemBase):
     description = models.TextField(null=True, blank=True)
     fk_courses = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
 
-
 class Word(ItemBase):
     class Meta:
         db_table = 'word'
@@ -71,7 +70,6 @@ class Word(ItemBase):
     spelling = models.CharField(max_length=255, null=True, blank=True, unique=True)
     sound = models.FileField(default=None, blank=True, null=True, upload_to='words_sound/%Y/%m')
     example = models.TextField(null=True, blank=True)
-
 
 class Grammar(ItemBase):
     class Meta:

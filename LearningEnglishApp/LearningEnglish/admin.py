@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import mark_safe
 from .models import Category, Course, Lesson, Tag, Word, Reading, Question, Grammar, Listen, Lesson_Category_WLRG, TitleGrammar
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -10,6 +11,15 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active","description", "image"]
     search_fields = ["id", "name", "created_date", "updated_date"]
     list_filter = ["name", "created_date", "updated_date"]
+    readonly_fields = ["display"]
+
+    def display(self, course):
+        if course:
+            print("vao")
+            return mark_safe(
+                '<img src="/static/{url}/" width="120" />' \
+                    .format(url=course.image.name)
+            )
 
 class LessonAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active", "index", "description","fk_courses"]
