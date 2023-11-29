@@ -1,0 +1,12 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h1>THỐNG KÊ THÔNG TIN</h1>
+<h2>Số lượng khóa học: {{course_count}}</h2>
+<ul>
+<ul>
+    {% for s in stats %}
+    <li><strong>{{s.name}}</strong> co : {{s.lesson_count}}</li>
+    {% endfor %}
+</ul>
+</ul>
+{% endblock %}

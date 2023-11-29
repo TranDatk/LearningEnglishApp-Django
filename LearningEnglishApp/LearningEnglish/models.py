@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
@@ -27,7 +28,7 @@ class Tag(ItemBase):
 class Question(models.Model):
     class Meta:
         db_table = 'question'
-    content = models.TextField(null=False, blank=True)
+    content = RichTextField(null=False, blank=True)
     ft_answer = models.CharField(max_length=255,null=True)
     sd_answer = models.CharField(max_length=255,null=True)
     td_answer = models.CharField(max_length=255, null=True)
@@ -86,7 +87,7 @@ class Listen(ItemBase):
 class Reading(ItemBase):
     class Meta:
         db_table = 'reading'
-    paragraph = models.TextField(null=True, blank=True)
+    paragraph = RichTextField(null=True, blank=True)
 
 class TitleGrammar(ItemBase):
     class Meta:
