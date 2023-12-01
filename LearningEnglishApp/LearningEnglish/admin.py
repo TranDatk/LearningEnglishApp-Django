@@ -6,6 +6,7 @@ from django.template.response import TemplateResponse
 from django.utils.html import mark_safe
 from django.urls import path
 from .models import Category, Course, Lesson, Tag, Word, Reading, Question, Grammar, Listen, Lesson_Category_WLRG, TitleGrammar
+from django.contrib.auth.models import Permission
 
 class QuestionForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget)
