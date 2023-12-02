@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, generics,status
 from rest_framework.response import Response
-
-from .models import Course, Lesson
+from rest_framework.parsers import MultiPartParser
+from .models import Course, Lesson, User
 from rest_framework.decorators import action
-from .serializers import CourseSerializer, LessonSerializer
+from .serializers import CourseSerializer, LessonSerializer, UserSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -42,6 +42,18 @@ class LessonViewSet(viewsets.ModelViewSet):
 
 def index(request):
     return render(request,template_name='index.html', context={'name':'Dat'})
+
+class UserViewSet(viewsets.ViewSet,
+                  generics.CreateAPIView,
+                  generics.RetrieveAPIView):
+    queryset = User.objects.filter(is_active=True)
+    serializer_class = UserSerializer
+    parser_classes = [MultiPartParser, ]
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
 def welcome(request, year):
     return HttpResponse("Hello " + str(year))
