@@ -7,6 +7,9 @@ Welcome to the Learning English App API documentation. This application primaril
 ### 1. User learning and course relationships
 ![Course LearningEnglishApp](https://github.com/TranDatk/LearningEnglishApp-Django/assets/84312661/5adc7be1-7433-4e8b-9cca-09e19a4d4c6c)
 
+### 2. User Infor
+
+![User Learning English App](https://github.com/TranDatk/LearningEnglishApp-Django/assets/84312661/d71a566a-165e-45b7-b897-18638a3c06af)
 
 ## API Endpoints
 
