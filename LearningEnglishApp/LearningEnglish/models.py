@@ -100,6 +100,9 @@ class Lesson_Category_WLRG(models.Model):
     id_WLRG = models.IntegerField(null=False)
     fk_Lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
     fk_Category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return "Id: " + str(self.id_WLRG) + " - Lesson: " + str(self.fk_Lesson) \

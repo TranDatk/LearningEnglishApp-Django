@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import mimetypes
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'drf_yasg',
     'debug_toolbar',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -54,10 +56,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
-import mimetypes
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTION", "PATCH", "POST", "PUT",]
+CORS_ALLOWED_ORIGINS = ["https://example.com",]
 
 mimetypes.add_type("application/javascript", ".js", True)
 
@@ -93,7 +98,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'LearningEnglishApp.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
