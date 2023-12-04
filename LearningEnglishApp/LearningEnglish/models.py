@@ -17,6 +17,58 @@ class ItemBase(models.Model):
     def __str__(self):
         return self.name
 
+class Process(models.Model):
+    class Meta:
+        db_table = 'process'
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    progress = models.IntegerField(default=0)
+    fk_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="process_user")
+    fk_course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True, related_name="process_course")
+
+    def __str__(self):
+        return str(self.id) + " : " + str(self.progress)
+
+class Score(models.Model):
+    class Meta:
+        db_table = 'score'
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    score = models.IntegerField(default=0)
+    fk_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="score_user")
+
+    def __str__(self):
+        return str(self.id) + " : " + str(self.score)
+
+class Friends(models.Model):
+    class Meta:
+        db_table = 'friends'
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    fk_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="users")
+    fk_friend_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="user_friend")
+
+    def __str__(self):
+        return str(self.id) + " : " + str(self.fk_friend_id)
+
+class Ranking(models.Model):
+    class Meta:
+        db_table = 'ranking'
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    score = models.IntegerField(default=0)
+    id_user = models.IntegerField(default=None)
+    name = models.CharField(max_length=255)
+
+
 class Tag(ItemBase):
     class Meta:
         db_table = 'tag'
@@ -75,7 +127,7 @@ class Word(ItemBase):
 class Grammar(ItemBase):
     class Meta:
         db_table = 'grammar'
-    recipe = models.CharField(max_length=255,null=True, blank=True)
+    recipe = RichTextField(null=True, blank=True)
     example = models.TextField(null=True, blank=True)
     fk_title_grammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, related_name="grammars")
 

@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Course, Tag, Lesson, User
+from .models import Course, Tag, Lesson, User, Process
+
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -31,3 +32,9 @@ class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson
         fields = ["id", "name", "index", "description", "fk_courses","created_date", "updated_date","is_active"]
+
+
+class ProcessSerializer(ModelSerializer):
+    class Meta:
+        model = Process
+        fields = ["id", "progress", "fk_user", "fk_course", "created_date", "updated_date", "is_active"]

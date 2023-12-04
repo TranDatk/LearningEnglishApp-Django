@@ -4,9 +4,9 @@ from django.views import View
 from rest_framework import viewsets, permissions, generics,status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from .models import Course, Lesson, User
+from .models import Course, Lesson, User, Process
 from rest_framework.decorators import action
-from .serializers import CourseSerializer, LessonSerializer, UserSerializer
+from .serializers import CourseSerializer, LessonSerializer, UserSerializer, ProcessSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -54,6 +54,11 @@ class UserViewSet(viewsets.ViewSet,
         if self.action == 'retrieve':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
+
+class ProcessViewSet(viewsets.ModelViewSet):
+    queryset = Process.objects.filter(is_active=True)
+    serializer_class = ProcessSerializer
+
 
 def welcome(request, year):
     return HttpResponse("Hello " + str(year))
