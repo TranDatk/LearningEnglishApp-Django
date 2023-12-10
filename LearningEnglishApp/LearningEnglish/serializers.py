@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Course, Tag, Lesson, User, Process
+from .models import *
 
 
 class UserSerializer(ModelSerializer):
@@ -33,8 +33,68 @@ class LessonSerializer(ModelSerializer):
         model = Lesson
         fields = ["id", "name", "index", "description", "fk_courses","created_date", "updated_date","is_active"]
 
-
 class ProcessSerializer(ModelSerializer):
     class Meta:
         model = Process
         fields = ["id", "progress", "fk_user", "fk_course", "created_date", "updated_date", "is_active"]
+
+class QuestionSerializer(ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["id","content", "created_date", "updated_date", "is_active", "correct_answer",
+                  "ft_answer", "sd_answer","td_answer","fh_answer","fk_lesson"]
+
+class GrammarSerializer(ModelSerializer):
+    class Meta:
+        model = Grammar
+        fields = ["id", "name", "recipe","example","created_date", "updated_date", "is_active", "fk_title_grammar"]
+
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "created_date", "updated_date", "is_active"]
+
+class WordSerializer(ModelSerializer):
+    class Meta:
+        model = Word
+        fields = ["id", "name", "means", "spelling", "sound", "example" ,"created_date", "updated_date", "is_active"]
+
+class ReadingSerializer(ModelSerializer):
+    class Meta:
+        model = Reading
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "paragraph"]
+
+class ListeningSerializer(ModelSerializer):
+    class Meta:
+        model = Listen
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "sound"]
+
+class TitleGrammarSerializer(ModelSerializer):
+    class Meta:
+        model = TitleGrammar
+        fields = ["id", "name", "created_date", "updated_date", "is_active"]
+
+class Lesson_Category_WLRGSerializer(ModelSerializer):
+    class Meta:
+        model = Lesson_Category_WLRG
+        fields = ["id", "created_date", "updated_date", "is_active", "id_WLRG", "fk_lesson", "fk_category"]
+
+class ProcessSerializer(ModelSerializer):
+    class Meta:
+        model = Process
+        fields = ["id", "created_date", "updated_date", "is_active", "fk_user", "fk_course", "progress"]
+
+class ScoreSerializer(ModelSerializer):
+    class Meta:
+        model = Score
+        fields = ["id", "created_date", "updated_date", "is_active", "fk_user", "score"]
+
+class FriendSerializer(ModelSerializer):
+    class Meta:
+        model = Friends
+        fields = ["id", "created_date", "updated_date", "is_active", "fk_user", "fk_friend_id"]
+
+class RankingSerializer(ModelSerializer):
+    class Meta:
+        model = Ranking
+        fields = ["id", "created_date", "updated_date", "is_active", "score", "id_user", "name"]

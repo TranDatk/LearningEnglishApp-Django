@@ -128,7 +128,6 @@ class UserAdmin(admin.ModelAdmin):
 class LearningEnglishAppAdminSite(admin.AdminSite):
     site_header = 'LearningEnglishApp'
     index_title = 'Hệ thống quản lý khóa học tiếng Anh'
-    login_template = 'admin/login.html'
 
     def get_urls(self):
         return [

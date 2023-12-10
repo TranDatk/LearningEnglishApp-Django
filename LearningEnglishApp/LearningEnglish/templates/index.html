@@ -1,10 +1,12 @@
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <title>Welcome</title>
-</head>
-<body>
-    <h1>hello {{name}}</h1>
-</body>
-</html>
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h1>THỐNG KÊ THÔNG TIN</h1>
+<h2>Số lượng khóa học: {{course_count}}</h2>
+<ul>
+<ul>
+    {% for s in stats %}
+    <li><strong>{{s.name}}</strong> co : {{s.lesson_count}}</li>
+    {% endfor %}
+</ul>
+</ul>
+{% endblock %}
