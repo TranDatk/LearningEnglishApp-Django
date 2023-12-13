@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
@@ -7,6 +8,7 @@ from rest_framework.parsers import MultiPartParser
 from .models import *
 from rest_framework.decorators import action
 from .serializers import *
+from django.http import JsonResponse
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -56,16 +58,68 @@ class LessonViewSet(viewsets.ModelViewSet):
         return Response(data=LessonSerializer(l, context={'request':request}).data, status=status.HTTP_200_OK)
 
 class UserViewSet(viewsets.ViewSet,
-                  generics.CreateAPIView,
-                  generics.RetrieveAPIView,):
+                  generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
 
     def get_permissions(self):
-        if self.action == 'retrieve':
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+        if self.action == 'list' or self.action == 'hide_user':
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
+
+    @action(methods=['get'], detail=False, url_path='current-user')
+    def current_user(self, request):
+        return Response(self.serializer_class(request.user).data)
+
+    @action(methods=['patch'], detail=False, url_path='update-user')
+    def update_user(self, request):
+        user = request.user
+        if user is not None:
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['post'], detail=False, url_path='register')
+    def register_user(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['patch'], detail=False, url_path='change-password')
+    def change_password(self, request):
+        user = request.user
+        data = request.data
+
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+
+        if not user.check_password(old_password):
+            return Response({'message': 'Mật khẩu cũ không đúng'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'message': 'Mật khẩu đã được thay đổi'}, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True,
+            url_path="hide-user",
+            url_name="hide-user")
+    def hide_user(self, request, pk):
+        try:
+            u = User.objects.get(pk=pk)
+            u.is_active = not u.is_active
+            u.save()
+        except Question.DoesNotExits:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=UserSerializer(u, context={'request': request}).data, status=status.HTTP_200_OK)
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.filter(is_active=True)

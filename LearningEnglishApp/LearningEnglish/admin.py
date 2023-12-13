@@ -84,8 +84,8 @@ class ListenAdmin(admin.ModelAdmin):
     list_filter = ["name", "created_date", "updated_date"]
 
 class Lesson_Category_WLRGAdmin(admin.ModelAdmin):
-    list_display = ["id", "id_WLRG", "fk_Lesson", "fk_Category"]
-    search_fields = ["id", "id_WLRG", "fk_Lesson", "fk_Category"]
+    list_display = ["id", "id_WLRG", "fk_lesson", "fk_category"]
+    search_fields = ["id", "id_WLRG", "fk_lesson", "fk_category"]
 
 class TitleGrammarAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active"]

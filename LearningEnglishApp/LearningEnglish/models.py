@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
+    email = models.CharField(max_length=255, null=False, unique=True)
 
 class ItemBase(models.Model):
     class Meta:
@@ -147,15 +148,15 @@ class TitleGrammar(ItemBase):
 
 class Lesson_Category_WLRG(models.Model):
     class Meta:
-        unique_together = ('id_WLRG','fk_Lesson','fk_Category')
+        unique_together = ('id_WLRG','fk_lesson','fk_category')
         db_table = 'lesson_category_wlrg'
     id_WLRG = models.IntegerField(null=False)
-    fk_Lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
-    fk_Category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
+    fk_lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
+    fk_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return "Id: " + str(self.id_WLRG) + " - Lesson: " + str(self.fk_Lesson) \
-               + " - Category: " + str(self.fk_Category)
+        return "Id: " + str(self.id_WLRG) + " - Lesson: " + str(self.fk_lesson) \
+               + " - Category: " + str(self.fk_category)

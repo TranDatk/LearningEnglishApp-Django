@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import *
 
 
@@ -10,12 +11,26 @@ class UserSerializer(ModelSerializer):
             'password' : {'write_only':'true'}
         }
 
+    def validate(self, data):
+        if 'password' not in data or 'username' not in data or data['password'] == '' or data['username'] == '':
+            raise serializers.ValidationError("Mật khẩu không được để trống")
+
+        email = data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Email đã tồn tại trong hệ thống")
+
+        username = data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Tên người dùng đã tồn tại trong hệ thống")
+        return data
+
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
 
         return user
+
 
 class TagSerializer(ModelSerializer):
     class Meta:
