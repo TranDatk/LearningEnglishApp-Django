@@ -19,8 +19,8 @@ export const login = async (username: string, password: string) => {
   cookies.save("access_token", data.access_token, { path: "/" });
 };
 
-export const AuthAPI = async () => {
-    const res = await fetch(BASE_URL, {
+export const getListUsers = async () => {
+    const res = await fetch(BASE_URL + endpoints["users"], {
       method: "GET",
       headers: {
         'Authorization':`Bearer ${cookies.load('access_token')}`

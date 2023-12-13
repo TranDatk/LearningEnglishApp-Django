@@ -1,52 +1,66 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../../styles/users.css'
-import { AuthAPI, login } from '../../api/user.api';
+import { getListUsers, login } from '../../api/user.api';
 
+interface IUser {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    avatar: string;
+    email: string;
+    is_superuser: boolean;
+    is_active: boolean;
+}
 
 const UserTable = () => {
+    const [listUsers, setListUsers] = useState([])
+
     useEffect(() => {
-        login("trandat", "12345678")
-        AuthAPI()
+        login("admin", "Admin@123")
+        getListUsers().then(value => {
+            setListUsers(value?.results ?? [])
+        }).catch(err => {
+            console.log(err);
+        });
     }, [])
 
+    console.log(listUsers)
+
     return (
-        <table>
-            <tr>
-                <th>Company</th>
-                <th>Contact</th>
-                <th>Country</th>
-            </tr>
-            <tr>
-                <td>Alfreds Futterkiste</td>
-                <td>Maria Anders</td>
-                <td>Germany</td>
-            </tr>
-            <tr>
-                <td>Centro comercial Moctezuma</td>
-                <td>Francisco Chang</td>
-                <td>Mexico</td>
-            </tr>
-            <tr>
-                <td>Ernst Handel</td>
-                <td>Roland Mendel</td>
-                <td>Austria</td>
-            </tr>
-            <tr>
-                <td>Island Trading</td>
-                <td>Helen Bennett</td>
-                <td>UK</td>
-            </tr>
-            <tr>
-                <td>Laughing Bacchus Winecellars</td>
-                <td>Yoshi Tannamuri</td>
-                <td>Canada</td>
-            </tr>
-            <tr>
-                <td>Magazzini Alimentari Riuniti</td>
-                <td>Giovanni Rovelli</td>
-                <td>Italy</td>
-            </tr>
-        </table>
+        <>
+            <h2>Table users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Avatar</th>
+                        <th>Admin</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {listUsers.map((value: IUser) => {
+                        return (
+                            <tr key={value?.id}>
+                                <td>{value?.id}</td>
+                                <td>{value?.username}</td>
+                                <td>{value?.first_name}</td>
+                                <td>{value?.last_name}</td>
+                                <td>{value?.email}</td>
+                                <td>{value?.avatar}</td>
+                                <td>{value?.is_superuser.toString()}</td>
+                                <td>{value?.is_active.toString()}</td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
+            </table>
+        </>
     )
 }
 

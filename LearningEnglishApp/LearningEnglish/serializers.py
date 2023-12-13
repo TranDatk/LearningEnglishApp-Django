@@ -1,3 +1,5 @@
+import uuid
+
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
@@ -6,7 +8,7 @@ from .models import *
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','first_name', 'last_name', 'email', 'username', 'password', 'avatar']
+        fields = ['id','first_name', 'last_name', 'email', 'username', 'password', 'avatar', 'is_active', 'is_superuser']
         extra_kwargs = {
             'password' : {'write_only':'true'}
         }
@@ -27,6 +29,7 @@ class UserSerializer(ModelSerializer):
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(validated_data['password'])
+        user.avatar( 'static/' + validated_data['avatar'] + str(uuid.uuid4()))
         user.save()
 
         return user
