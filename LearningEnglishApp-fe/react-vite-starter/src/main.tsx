@@ -8,14 +8,15 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import UsersPage from './screens/users.page.tsx';
-import Header from './components/users/header.tsx';
+import Header from './components/header.tsx';
+import Footer from './components/footer.tsx';
 
 const LayoutAdmin = () => {
   return (
     <div>
       <Header />
       <Outlet />
-      <footer>Footer</footer>
+      <Footer />
     </div>
   )
 }
