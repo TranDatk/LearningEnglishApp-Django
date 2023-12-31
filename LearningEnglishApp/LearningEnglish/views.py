@@ -3,8 +3,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
 from rest_framework import viewsets, permissions, generics,status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
+
+from .forms import UserRegisterForm, AdminRegisterForm
 from .models import *
 from rest_framework.decorators import action
 from .serializers import *
@@ -57,11 +60,15 @@ class LessonViewSet(viewsets.ModelViewSet):
 
         return Response(data=LessonSerializer(l, context={'request':request}).data, status=status.HTTP_200_OK)
 
+class UserPagination(PageNumberPagination):
+    page_size = 10
+
 class UserViewSet(viewsets.ViewSet,
                   generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
+    pagination_class = UserPagination
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'hide_user':
@@ -70,7 +77,8 @@ class UserViewSet(viewsets.ViewSet,
 
     @action(methods=['get'], detail=False, url_path='current-user')
     def current_user(self, request):
-        return Response(self.serializer_class(request.user).data)
+        return Response(self.serializer_class(request.user, context={"request": request}).data,
+                        status=status.HTTP_200_OK)
 
     @action(methods=['patch'], detail=False, url_path='update-user')
     def update_user(self, request):
@@ -85,11 +93,20 @@ class UserViewSet(viewsets.ViewSet,
 
     @action(methods=['post'], detail=False, url_path='register')
     def register_user(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_superuser:
+            form = AdminRegisterForm(data=request.POST)
+        else:
+            form = UserRegisterForm(data=request.POST)
+
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                errors = dict(form.errors)
+                return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid request method'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['patch'], detail=False, url_path='change-password')
     def change_password(self, request):

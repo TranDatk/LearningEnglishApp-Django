@@ -1,11 +1,10 @@
-import uuid
-
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
 
 
 class UserSerializer(ModelSerializer):
+    avatar = serializers.SerializerMethodField(source='avatar')
     class Meta:
         model = User
         fields = ['id','first_name', 'last_name', 'email', 'username', 'password', 'avatar', 'is_active', 'is_superuser']
@@ -26,10 +25,18 @@ class UserSerializer(ModelSerializer):
             raise serializers.ValidationError("Tên người dùng đã tồn tại trong hệ thống")
         return data
 
+    def get_avatar(self, user):
+        if user.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri('/static/%s' % user.avatar.name)
+
+            return '/static/%s' % user.avatar.name
+
+
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(validated_data['password'])
-        user.avatar( 'static/' + validated_data['avatar'] + str(uuid.uuid4()))
         user.save()
 
         return user

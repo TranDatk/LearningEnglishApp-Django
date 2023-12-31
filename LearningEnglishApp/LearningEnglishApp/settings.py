@@ -63,7 +63,8 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTION", "PATCH", "POST", "PUT",]
-CORS_ALLOWED_ORIGINS = ["https://example.com",]
+CORS_ALLOWED_ORIGINS = []
+ALLOWED_HOSTS = ["*"]
 
 mimetypes.add_type("application/javascript", ".js", True)
 
@@ -172,4 +173,21 @@ REST_FRAMEWORK = {
 
 OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+}
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'app_api': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
 }

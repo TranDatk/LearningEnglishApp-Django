@@ -28,5 +28,4 @@ router.register('ranking', views.RankingViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin_site.urls)
-]
-# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

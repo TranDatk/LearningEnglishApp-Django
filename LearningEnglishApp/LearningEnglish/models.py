@@ -1,10 +1,21 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from ckeditor.fields import RichTextField
+from PIL import Image
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
     email = models.CharField(max_length=255, null=False, unique=True)
+
+    # def save(self, *args, **kwargs):
+    #     super(User, self).save(*args, **kwargs)
+    #
+    #     avatar = Image.open(self.avatar.path)
+    #
+    #     if avatar.height > 300 or avatar.width > 300:
+    #         output_size = (300, 300)
+    #         avatar.thumbnail(output_size)
+    #         avatar.save(self.avatar.path)
 
 class ItemBase(models.Model):
     class Meta:
