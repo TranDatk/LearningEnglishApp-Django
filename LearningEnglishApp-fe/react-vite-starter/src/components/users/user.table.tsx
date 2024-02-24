@@ -6,7 +6,8 @@ import { CheckCircleOutlined, CloseCircleOutlined, EditOutlined, PlusCircleOutli
 import {
     Space, Button, Image
 } from 'antd';
-import AddUserModal from './user.modal';
+import AddUserModal from './create.user.modal';
+import UpdateUserModal from './update.user.modal';
 
 export interface IUser {
     id: number;
@@ -21,86 +22,13 @@ export interface IUser {
     is_active: boolean;
 }
 
-const columns: ColumnsType<IUser> = [
-    {
-        title: 'Id',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: 'Username',
-        dataIndex: 'username',
-        key: 'username',
-    },
-    {
-        title: 'Firstname',
-        dataIndex: 'first_name',
-        key: 'first_name',
-    },
-    {
-        title: 'Lastname',
-        dataIndex: 'last_name',
-        key: 'last_name',
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-    },
-    {
-        title: 'Avatar',
-        dataIndex: 'avatar',
-        key: 'avatar',
-        render: (_, { avatar }) => (
-            <>
-                <Image
-                    width={50}
-                    src={avatar}
-                    style={{ borderRadius: 400 / 2 }}
-                />
-            </>
-        ),
-    },
-    {
-        title: 'is_superuser',
-        dataIndex: 'is_superuser',
-        key: 'is_superuser',
-        render: (_, { is_superuser }) => (
-            <>
-                {is_superuser && <CheckCircleOutlined style={{ color: 'green' }} />}
-                {!is_superuser && <CloseCircleOutlined style={{ color: 'red' }} />}
-            </>
-        ),
-    },
-    {
-        title: 'is_active',
-        dataIndex: 'is_active',
-        key: 'is_active',
-        render: (_, { is_active }) => (
-            <>
-                {is_active && <CheckCircleOutlined style={{ color: 'green' }} />}
-                {!is_active && <CloseCircleOutlined style={{ color: 'red' }} />}
-            </>
-        ),
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: () => (
-            <Space size="middle">
-                <Button onClick={() => { }} type="default" icon={<EditOutlined />} style={{ background: '#F0E68C' }} />
-                <Button onClick={() => { }} type="primary" danger icon={<DeleteOutlined />} />
-            </Space>
-        ),
-    },
-]
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
 const UserTable = () => {
     const [listUsers, setListUsers] = useState([])
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isAddSuccess, setIsAddSuccess] = useState(false)
+    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false)
+    const [isUpdateUserModal, setIsUpdateUserModal] = useState(false)
+    const [dataUpdate, setDataUpdate] = useState<null | IUser>(null)
 
     useEffect(() => {
         login("admin", "Admin@123")
@@ -109,16 +37,114 @@ const UserTable = () => {
         }).catch(err => {
             console.log(err);
         });
-    }, [isAddSuccess,])
+    }, [isAddSuccess, isUpdateSuccess])
+
+    const columns: ColumnsType<IUser> = [
+        {
+            title: 'Id',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: 'Username',
+            dataIndex: 'username',
+            key: 'username',
+        },
+        {
+            title: 'Firstname',
+            dataIndex: 'first_name',
+            key: 'first_name',
+        },
+        {
+            title: 'Lastname',
+            dataIndex: 'last_name',
+            key: 'last_name',
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+        },
+        {
+            title: 'Avatar',
+            dataIndex: 'avatar',
+            key: 'avatar',
+            render: (_, { avatar }) => (
+                <>
+                    <Image
+                        width={50}
+                        src={avatar}
+                        style={{ borderRadius: 400 / 2 }}
+                    />
+                </>
+            ),
+        },
+        {
+            title: 'is_superuser',
+            dataIndex: 'is_superuser',
+            key: 'is_superuser',
+            render: (_, { is_superuser }) => (
+                <>
+                    {is_superuser && <CheckCircleOutlined style={{ color: 'green' }} />}
+                    {!is_superuser && <CloseCircleOutlined style={{ color: 'red' }} />}
+                </>
+            ),
+        },
+        {
+            title: 'is_active',
+            dataIndex: 'is_active',
+            key: 'is_active',
+            render: (_, { is_active }) => (
+                <>
+                    {is_active && <CheckCircleOutlined style={{ color: 'green' }} />}
+                    {!is_active && <CloseCircleOutlined style={{ color: 'red' }} />}
+                </>
+            ),
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (value, record) => (
+                <Space size="middle">
+                    <Button
+                        onClick={
+                            () => {
+                                setIsUpdateUserModal(true)
+                                setDataUpdate(record)
+                            }}
+                        type="default"
+                        icon={<EditOutlined />}
+                        style={{ background: '#F0E68C' }} />
+                    <Button onClick={() => { }} type="primary" danger icon={<DeleteOutlined />} />
+                </Space>
+            ),
+        },
+    ]
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <h2>Danh sách người dùng</h2>
-                <Button onClick={() => setIsAddUserModalOpen(true)} type="primary" icon={<PlusCircleOutlined />} style={{ background: '#9ACD32', marginTop: '20px', marginRight: '10vw' }}>Thêm mới</Button>
+                <Button
+                    onClick={() => setIsAddUserModalOpen(true)}
+                    type="primary"
+                    icon={<PlusCircleOutlined />}
+                    style={{ background: '#9ACD32', marginTop: '20px', marginRight: '10vw' }}>Thêm mới
+                </Button>
             </div>
-            <Table columns={columns} dataSource={listUsers} />
-            <AddUserModal isModalOpen={isAddUserModalOpen} setIsModalOpen={setIsAddUserModalOpen} setIsAddSuccess={setIsAddSuccess} />
+            <Table
+                columns={columns}
+                dataSource={listUsers} />
+            <AddUserModal isModalOpen={isAddUserModalOpen}
+                setIsModalOpen={setIsAddUserModalOpen}
+                setIsAddSuccess={setIsAddSuccess} />
+            <UpdateUserModal
+                isModalOpen={isUpdateUserModal}
+                setIsModalOpen={setIsUpdateUserModal}
+                setIsAddSuccess={setIsUpdateSuccess}
+                dataUpdate={dataUpdate} />
         </>
     )
 }
