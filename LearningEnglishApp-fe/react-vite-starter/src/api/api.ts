@@ -9,6 +9,7 @@ export const endpoints = {
   login: "/o/token/",
   users : "/users/",
   register : "/users/register/",
+  updateUser : "/users/update-user/",
 };
 
 export default axios.create({

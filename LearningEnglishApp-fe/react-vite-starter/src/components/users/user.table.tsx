@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getListUsers, login } from '../../api/user.api';
+import { getListUsers, hideUser } from '../../api/user.api';
 import type { ColumnsType } from 'antd/es/table';
 import Table from 'antd/es/table';
 import { CheckCircleOutlined, CloseCircleOutlined, EditOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
-    Space, Button, Image
+    Space, Button, Image, notification, Popconfirm, message
 } from 'antd';
 import AddUserModal from './create.user.modal';
 import UpdateUserModal from './update.user.modal';
@@ -24,20 +24,52 @@ export interface IUser {
 
 const UserTable = () => {
     const [listUsers, setListUsers] = useState([])
+    const [meta, setMeta] = useState({
+        current: 1,
+        total: 0,
+        pageSize: 5
+    })
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-    const [isAddSuccess, setIsAddSuccess] = useState(false)
-    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false)
     const [isUpdateUserModal, setIsUpdateUserModal] = useState(false)
     const [dataUpdate, setDataUpdate] = useState<null | IUser>(null)
+    const updateListUser = async () => {
+        getListUsers(meta.current).then((value) => {
+            setListUsers(value?.data?.results ?? [])
+            setMeta({
+                current: meta.current,
+                total: value?.data?.count,
+                pageSize: meta.pageSize
+            })
+        }).catch(err => {
+            notification.error({
+                message: JSON.stringify(err.message)
+            })
+        });
+    }
 
     useEffect(() => {
-        login("admin", "Admin@123")
-        getListUsers().then((value) => {
-            setListUsers(value?.data?.results ?? [])
+        updateListUser()
+    }, [meta.current])
+
+    const confirm = (user: IUser) => {
+        hideUser(user?.id).then((value) => {
+            if (value) {
+                notification.success({
+                    message: `Xóa thành công người dùng ${user?.id}`
+                })
+                getListUsers(meta.current)
+            }
         }).catch(err => {
-            console.log(err);
-        });
-    }, [isAddSuccess, isUpdateSuccess])
+            notification.error({
+                message: JSON.stringify(err?.message)
+            })
+            return
+        })
+    };
+
+    const cancel = () => {
+        message.error('Click on No');
+    };
 
     const columns: ColumnsType<IUser> = [
         {
@@ -111,11 +143,24 @@ const UserTable = () => {
                             () => {
                                 setIsUpdateUserModal(true)
                                 setDataUpdate(record)
-                            }}
+                            }
+                        }
                         type="default"
                         icon={<EditOutlined />}
                         style={{ background: '#F0E68C' }} />
-                    <Button onClick={() => { }} type="primary" danger icon={<DeleteOutlined />} />
+                    <Popconfirm
+                        title="Xóa người dùng"
+                        description="Bạn chắc chắn muốn xóa người dùng này?"
+                        onConfirm={() => { confirm(record) }}
+                        onCancel={cancel}
+                        okText="Đồng ý"
+                        cancelText="Hủy">
+                        <Button
+                            onClick={() => { }}
+                            type="primary"
+                            danger
+                            icon={<DeleteOutlined />} />
+                    </Popconfirm>
                 </Space>
             ),
         },
@@ -136,14 +181,24 @@ const UserTable = () => {
             </div>
             <Table
                 columns={columns}
-                dataSource={listUsers} />
-            <AddUserModal isModalOpen={isAddUserModalOpen}
+                dataSource={listUsers}
+                pagination={{
+                    current: meta.current,
+                    total: meta.total,
+                    pageSize: meta.pageSize,
+                    onChange: (page) => { setMeta({ current: page, total: meta.total, pageSize: meta.pageSize }) },
+                    showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} người dùng`,
+                }} />
+            <AddUserModal
+                updateListUser={updateListUser}
+                isModalOpen={isAddUserModalOpen}
                 setIsModalOpen={setIsAddUserModalOpen}
-                setIsAddSuccess={setIsAddSuccess} />
+                meta={meta} />
             <UpdateUserModal
+                updateListUser={updateListUser}
                 isModalOpen={isUpdateUserModal}
                 setIsModalOpen={setIsUpdateUserModal}
-                setIsAddSuccess={setIsUpdateSuccess}
+                meta={meta}
                 dataUpdate={dataUpdate} />
         </>
     )

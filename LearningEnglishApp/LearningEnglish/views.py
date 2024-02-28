@@ -1,17 +1,13 @@
-from django.contrib.auth.hashers import make_password
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.views import View
 from rest_framework import viewsets, permissions, generics,status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser
 
-from .forms import UserRegisterForm, AdminRegisterForm
+from .forms import UserRegisterForm, AdminRegisterForm, UserUpdateForm
 from .models import *
 from rest_framework.decorators import action
 from .serializers import *
-from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -61,13 +57,13 @@ class LessonViewSet(viewsets.ModelViewSet):
         return Response(data=LessonSerializer(l, context={'request':request}).data, status=status.HTTP_200_OK)
 
 class UserPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 5
 
 class UserViewSet(viewsets.ViewSet,
                   generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
-    parser_classes = [MultiPartParser, ]
+    parser_classes = [MultiPartParser, FormParser]
     pagination_class = UserPagination
 
     def get_permissions(self):
@@ -82,14 +78,17 @@ class UserViewSet(viewsets.ViewSet,
 
     @action(methods=['patch'], detail=False, url_path='update-user')
     def update_user(self, request):
-        user = request.user
-        if user is not None:
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        user_id = request.data.get('id')
+        if not id:
+            return Response({'message': 'Không có ID user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, id=user_id)
+
+        form = UserUpdateForm(instance=user, data=request.data)
+        if form.is_valid():
+            form.save()
+            return Response({'message': 'Sửa thành công.'}, status=status.HTTP_200_OK)
+        return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False, url_path='register')
     def register_user(self, request):
@@ -132,9 +131,8 @@ class UserViewSet(viewsets.ViewSet,
             u = User.objects.get(pk=pk)
             u.is_active = not u.is_active
             u.save()
-        except Question.DoesNotExits:
+        except User.DoesNotExits:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
         return Response(data=UserSerializer(u, context={'request': request}).data, status=status.HTTP_200_OK)
 
 

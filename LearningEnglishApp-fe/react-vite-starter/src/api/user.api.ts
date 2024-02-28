@@ -22,9 +22,9 @@ export const login = async (username: string, password: string) => {
   cookies.save("access_token", data.access_token, { path: "/" });
 };
 
-export const getListUsers = async () => {
+export const getListUsers = async (currentPage : number) => {
   try {
-    const userList = await API.get(endpoints["users"]);
+    const userList = await API.get(`${endpoints["users"]}?page=${currentPage}`);
     return userList;
   } catch (error) {
     console.error("Đã xảy ra lỗi khi lấy danh sách người dùng:", error);
@@ -52,6 +52,43 @@ export const registerUser = async (user: IUser) => {
 
   } catch (error) {
     console.error("Đã xảy ra lỗi khi đăng ký người dùng:", error);
+    throw error;
+  }
+};
+
+export const updateUser = async (user: IUser) => {
+  try {
+    const res = await API.patch(endpoints["updateUser"], {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      is_superuser: user.is_superuser
+    }, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return res; 
+
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi sửa thông tin người dùng:", error);
+    throw error;
+  }
+};
+
+export const hideUser = async (id: number) => {
+  try {
+    const res = await API.post(endpoints["users"] + `${id}/hide-user/`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return res; 
+
+  } catch (error) {
+    console.error("Đã xảy ra lỗi khi ẩn người dùng:", error);
     throw error;
   }
 };

@@ -1,51 +1,60 @@
 import {
-    Modal, Form, Input, Switch, Button,
+    Modal, Form, Input, Switch, Button, notification,
 } from 'antd';
 import { IUser } from './user.table';
-import { registerUser } from '../../api/user.api';
+import { updateUser } from '../../api/user.api';
 import { useEffect } from 'react';
 
-interface IState {
+interface Ipropss {
     isModalOpen: boolean;
     setIsModalOpen: (isModalOpen: boolean) => void;
-    setIsAddSuccess: (isAddSuccess: boolean) => void;
+    updateListUser: () => void;
+    meta: { current: number, total: number };
     dataUpdate: IUser | null;
 }
 
-const UpdateUserModal = (state: IState) => {
+const UpdateUserModal = (props: Ipropss) => {
     const [form] = Form.useForm<IUser>();
 
-    state.setIsAddSuccess(false);
-
-    const handleOk = () => {
-        registerUser(form.getFieldsValue()).then((value) => {
+    const onFinish = async () => {
+        updateUser(form.getFieldsValue()).then((value) => {
             if (!!value) {
-                state.setIsAddSuccess(true)
+                props.updateListUser()
             }
+            notification.success({
+                message: JSON.stringify(value?.data?.message)
+            })
+        }).catch(err => {
+            notification.error({
+                message: JSON.stringify(err?.message)
+            })
+            return
         })
-        state.setIsModalOpen(false);
+        props.setIsModalOpen(false);
     };
 
     useEffect(() => {
-        form.setFieldValue("username", state.dataUpdate?.username)
-        form.setFieldValue("first_name", state.dataUpdate?.first_name)
-        form.setFieldValue("last_name", state.dataUpdate?.last_name)
-        form.setFieldValue("email", state.dataUpdate?.email)
-        form.setFieldValue("is_superuser", state.dataUpdate?.is_superuser)
-    }, [state.dataUpdate])
+        if (props.dataUpdate) {
+            form.setFieldValue("id", props.dataUpdate?.id)
+            form.setFieldValue("username", props.dataUpdate?.username)
+            form.setFieldValue("first_name", props.dataUpdate?.first_name)
+            form.setFieldValue("last_name", props.dataUpdate?.last_name)
+            form.setFieldValue("email", props.dataUpdate?.email)
+            form.setFieldValue("is_superuser", props.dataUpdate?.is_superuser)
+        }
+    }, [props.dataUpdate])
 
     return (
         <Modal
             maskClosable={false}
             title="Sửa thông tin người dùng"
-            open={state.isModalOpen}
-            onOk={handleOk}
-            onCancel={() => state.setIsModalOpen(false)}
+            open={props.isModalOpen}
+            onCancel={() => props.setIsModalOpen(false)}
             footer={[
-                <Button key="back" onClick={() => state.setIsModalOpen(false)}>
+                <Button key="back" onClick={() => props.setIsModalOpen(false)}>
                     Hủy
                 </Button>,
-                <Button key="submit" htmlType='submit' type="primary" onClick={handleOk}>
+                <Button key="submit" type="primary" onClick={() => { form.submit() }}>
                     Xong
                 </Button>,
             ]}>
@@ -55,32 +64,39 @@ const UpdateUserModal = (state: IState) => {
                 layout="horizontal"
                 style={{ maxWidth: 600 }}
                 form={form}
-                onFinish={handleOk}
+                onFinish={onFinish}
             >
+                <Form.Item label="Id" name="id" rules={[{ required: true }]}>
+                    <Input
+                        disabled
+                        id="id"
+                        value={props?.dataUpdate?.id ?? ""}
+                        onChange={(e) => { form.setFieldValue("id", e.target.value) }} />
+                </Form.Item>
                 <Form.Item label="Username" name="username" rules={[{ required: true }]}>
                     <Input
                         id="username"
-                        value={state?.dataUpdate?.username ?? ""}
+                        value={props?.dataUpdate?.username ?? ""}
                         onChange={(e) => { form.setFieldValue("username", e.target.value) }} />
                 </Form.Item>
                 <Form.Item label="Firstname" name="first_name" rules={[{ required: true }]}>
                     <Input
-                        value={state?.dataUpdate?.first_name ?? ""}
+                        value={props?.dataUpdate?.first_name ?? ""}
                         onChange={(e) => { form.setFieldValue("first_name", e.target.value) }} />
                 </Form.Item>
                 <Form.Item label="Lastname" name="last_name" rules={[{ required: true }]}>
                     <Input
-                        value={state?.dataUpdate?.last_name ?? ""}
+                        value={props?.dataUpdate?.last_name ?? ""}
                         onChange={(e) => { form.setFieldValue("last_name", e.target.value) }} />
                 </Form.Item>
                 <Form.Item label="Email" name="email" rules={[{ required: true }]}>
                     <Input
-                        value={state?.dataUpdate?.email ?? ""}
+                        value={props?.dataUpdate?.email ?? ""}
                         onChange={(e) => { form.setFieldValue("email", e.target.value) }} />
                 </Form.Item>
                 <Form.Item label="is_superuser" name="is_superuser" valuePropName="checked" rules={[{ required: true }]}>
                     <Switch
-                        checked={state?.dataUpdate?.is_superuser ?? false}
+                        checked={props?.dataUpdate?.is_superuser ?? false}
                         onChange={(e) => { form.setFieldValue("is_superuser", e) }} />
                 </Form.Item>
             </Form>

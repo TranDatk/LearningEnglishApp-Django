@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -10,8 +10,12 @@ import {
 import UsersPage from './screens/users.page.tsx';
 import Header from './components/header.tsx';
 import Footer from './components/footer.tsx';
+import { login } from './api/user.api.ts';
 
 const LayoutAdmin = () => {
+  useEffect(() => {
+    login("admin", "Admin@123")
+  }, [])
   return (
     <div>
       <Header />

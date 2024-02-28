@@ -1,5 +1,5 @@
 import {
-    Modal, Form, Input, Switch, Button,
+    Modal, Form, Input, Switch, Button, notification,
 } from 'antd';
 import { IUser } from './user.table';
 import { registerUser } from '../../api/user.api';
@@ -7,7 +7,8 @@ import { registerUser } from '../../api/user.api';
 interface Istate {
     isModalOpen: boolean;
     setIsModalOpen: (isModalOpen: boolean) => void;
-    setIsAddSuccess: (isAddSuccess: boolean) => void;
+    updateListUser: () => void;
+    meta: { current: number, total: number };
 }
 
 // const normFile = (e: any) => {
@@ -19,13 +20,21 @@ interface Istate {
 
 const AddUserModal = (state: Istate) => {
     const [form] = Form.useForm<IUser>();
-    state.setIsAddSuccess(false);
 
-    const handleOk = () => {
+    const onFinish = () => {
         registerUser(form.getFieldsValue()).then((value) => {
             if (!!value) {
-                state.setIsAddSuccess(true)
+                state.updateListUser()
             }
+            notification.success({
+                message: "Tạo thành công"
+            })
+            return
+        }).catch(err => {
+            notification.error({
+                message: JSON.stringify(err?.message)
+            })
+            return
         })
         state.setIsModalOpen(false);
     };
@@ -35,13 +44,12 @@ const AddUserModal = (state: Istate) => {
             maskClosable={false}
             title="Thêm người dùng"
             open={state.isModalOpen}
-            onOk={handleOk}
             onCancel={() => state.setIsModalOpen(false)}
             footer={[
                 <Button key="back" onClick={() => state.setIsModalOpen(false)}>
                     Hủy
                 </Button>,
-                <Button key="submit" htmlType='submit' type="primary" onClick={handleOk}>
+                <Button key="submit" type="primary" onClick={() => { form.submit() }}>
                     Thêm mới
                 </Button>,
             ]}>
@@ -51,7 +59,7 @@ const AddUserModal = (state: Istate) => {
                 layout="horizontal"
                 style={{ maxWidth: 600 }}
                 form={form}
-                onFinish={handleOk}
+                onFinish={onFinish}
             >
                 <Form.Item label="Username" name="username" rules={[{ required: true }]}>
                     <Input onChange={(e) => { form.setFieldValue("username", e.target.value) }} />
@@ -71,7 +79,7 @@ const AddUserModal = (state: Istate) => {
                 <Form.Item label="Email" name="email" rules={[{ required: true }]}>
                     <Input onChange={(e) => { form.setFieldValue("email", e.target.value) }} />
                 </Form.Item>
-                <Form.Item label="is_superuser" name="is_superuser" valuePropName="checked" rules={[{ required: true }]}>
+                <Form.Item label="is_superuser" name="is_superuser" valuePropName="checked">
                     <Switch onChange={(e) => { form.setFieldValue("is_superuser", e) }} />
                 </Form.Item>
                 {/* <Form.Item label="Upload" name="avatar" valuePropName="fileList" getValueFromEvent={normFile}>
