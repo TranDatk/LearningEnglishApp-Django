@@ -53,6 +53,17 @@ class CourseSerializer(ModelSerializer):
         model = Course
         fields = ["id", "name", "image", "created_date", "is_active", "tag"]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Xóa domain từ URL hình ảnh
+        if 'image' in representation and representation['image']:
+            representation['image'] = representation['image'].replace(self.context['request'].build_absolute_uri('/'),
+                                                                      '')
+
+        return representation
+
+
 class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson

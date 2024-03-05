@@ -13,12 +13,6 @@ from django.shortcuts import get_object_or_404
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.filter(is_active = True)
     serializer_class = CourseSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
 
     @action(methods=['post'], detail=True,
             url_path="hide-course",
@@ -33,6 +27,34 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         return Response(data=CourseSerializer(c, context={'request': request}).data, status=status.HTTP_200_OK)
 
+    @action(methods=['post'], detail=False,
+            url_path="search-by-tag",
+            url_name="search-by-tag")
+    def search_by_tag(self, request):
+        try:
+            tags = request.data.get('tags', [])
+            courses = Course.objects.filter(tag__name__in=tags).distinct()
+            serializer = CourseSerializer(courses, many=True, context={'request': request})
+
+            # Tạo đối tượng kết quả mới
+            response_data = {
+                'error': None,
+                'message': 'Success',
+                'statusCode': status.HTTP_200_OK,
+                'results': serializer.data,
+            }
+
+            return Response(data=response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # Trường hợp có lỗi
+            response_data = {
+                'error': str(e),
+                'message': 'Error',
+                'statusCode': status.HTTP_400_BAD_REQUEST,
+                'results': None,
+            }
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.filter(is_active=True)

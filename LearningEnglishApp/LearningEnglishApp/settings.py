@@ -169,10 +169,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES' : (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
-    'DEFAULT_PARSER_CLASSES':(
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser'
-    )
 }
 
 OAUTH2_PROVIDER = {
