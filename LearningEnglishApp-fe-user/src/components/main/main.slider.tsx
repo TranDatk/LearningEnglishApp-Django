@@ -8,14 +8,20 @@ import Divider from "@mui/material/Divider";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
-const MainSlider = () => {
+interface IProps {
+    results: ICourse[]
+}
+
+const MainSlider = (props: IProps) => {
+    const { results } = props;
+
     const NextArrow = (props: any) => {
         return (
-            <Button variant="outlined" onClick={props.onClick}
+            <Button color="inherit" variant="contained" onClick={props.onClick}
                 sx={{
                     position: "absolute",
-                    right: 0,
-                    top: "50%",
+                    right: 40,
+                    top: "25%",
                     zIndex: 2,
                     minWidth: 30,
                     width: 35
@@ -27,10 +33,10 @@ const MainSlider = () => {
 
     const PrevArrow = (props: any) => {
         return (
-            <Button variant="outlined" onClick={props.onClick}
+            <Button color="inherit" variant="contained" onClick={props.onClick}
                 sx={{
                     position: "absolute",
-                    top: "50%",
+                    top: "25%",
                     zIndex: 2,
                     minWidth: 30,
                     width: 35
@@ -53,8 +59,12 @@ const MainSlider = () => {
     return (
         <Box sx={{
             margin: "0 50px",
-            ".abc": {
-                padding: "0 10px"
+            ".course": {
+                padding: "0 10px",
+                "img": {
+                    height: 150,
+                    width: 150
+                }
             },
             "h3": {
                 border: "1px solid #ccc",
@@ -64,24 +74,15 @@ const MainSlider = () => {
         }}>
             <h2>Tieu de</h2>
             <Slider {...settings}>
-                <div className="abc">
-                    <h3>1</h3>
-                </div>
-                <div className="abc">
-                    <h3>2</h3>
-                </div>
-                <div className="abc">
-                    <h3>3</h3>
-                </div>
-                <div className="abc">
-                    <h3>4</h3>
-                </div>
-                <div className="abc">
-                    <h3>5</h3>
-                </div>
-                <div className="abc">
-                    <h3>6</h3>
-                </div>
+                {Array.isArray(results) && results.map(course => {
+                    return (
+                        <div className="course" key={course.id}>
+                            <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${course.image}`} alt="course" />
+                            <h4>{course.name}</h4>
+                        </div>
+                    )
+                })
+                }
             </Slider>
         </Box>
     );
