@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeRegistry>
           <AppHeader />
           {children}
-          <AppFooter />
+          {/* <AppFooter /> */}
         </ThemeRegistry>
       </body>
     </html>

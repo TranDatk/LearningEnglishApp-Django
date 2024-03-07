@@ -9,8 +9,6 @@ export default async function HomePage() {
     body: { "tags": ["TOEIC"] }
   })
 
-  console.log(res)
-
   return (
     <Container>
       <MainSlider
