@@ -20,6 +20,8 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react"
+
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -62,6 +64,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function AppHeader() {
+    const { data: session } = useSession()
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const router = useRouter();
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
@@ -211,11 +215,17 @@ export default function AppHeader() {
                                 textDecoration: "unset"
                             }
                         }}>
-                            <Link href={"/ielts"}>IELTS</Link>
-                            <Link href={"/toeic"}>TOEIC</Link>
-                            <Link href={"/voca"}>VOCA</Link>
-                            <Avatar
-                                onClick={handleProfileMenuOpen}>H</Avatar>
+                            {
+                                session ? <>
+                                    <Link href={"/ielts"}>IELTS</Link>
+                                    <Link href={"/toeic"}>TOEIC</Link>
+                                    <Link href={"/voca"}>VOCA</Link>
+                                    <Avatar
+                                        onClick={handleProfileMenuOpen}>H</Avatar>
+                                </> :
+                                    <Link href={"/api/auth/signin"}>Login</Link>
+                            }
+
                         </Box>
                     </Toolbar>
                 </Container>
