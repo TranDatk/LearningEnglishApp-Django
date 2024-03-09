@@ -6,6 +6,8 @@ from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
 from django.conf import settings
 
+from .views import GithubLogin, CustomTokenView
+
 router = DefaultRouter()
 router.register('course', views.CourseViewSet)
 router.register('lesson', views.LessonViewSet)
@@ -27,5 +29,8 @@ router.register('ranking', views.RankingViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin_site.urls)
+    path('admin/', admin_site.urls),
+    path(r"o/token/", CustomTokenView.as_view(), name="token"),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('github/', GithubLogin.as_view(), name="github_login"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -7,6 +7,12 @@ declare global {
         name: string;
     }
 
+    interface backendResponse{
+        access : string;
+        refresh : string;
+        user: IUser;
+    }
+
     interface ICourse {
         "id": number;
         "name": string;

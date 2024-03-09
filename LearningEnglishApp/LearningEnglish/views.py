@@ -8,7 +8,45 @@ from .models import *
 from rest_framework.decorators import action
 from .serializers import *
 from django.shortcuts import get_object_or_404
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from django.http import HttpResponse
+from oauth2_provider.views.base import TokenView
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
+from oauth2_provider.models import get_access_token_model, get_application_model
+from oauth2_provider.signals import app_authorized
+import json
 
+class CustomTokenView(TokenView):
+    @method_decorator(sensitive_post_parameters("password"))
+    def post(self, request, *args, **kwargs):
+        url, headers, body, status = self.create_token_response(request)
+        if status == 200:
+            body = json.loads(body)
+            access_token = body.get("access_token")
+            if access_token is not None:
+                token = get_access_token_model().objects.get(
+                    token=access_token)
+                app_authorized.send(
+                    sender=self, request=request,
+                    token=token)
+                body['user'] = {
+                    'id': token.user.id,
+                    'username': token.user.username,
+                    'email': token.user.email,
+                }
+                body = json.dumps(body)
+        response = HttpResponse(content=body, status=status)
+        for k, v in headers.items():
+            response[k] = v
+        return response
+
+class GithubLogin(SocialLoginView):
+    adapter_class = GitHubOAuth2Adapter
+    callback_url = "http://127.0.0.1:3000/"
+    client_class = OAuth2Client
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.filter(is_active = True)
