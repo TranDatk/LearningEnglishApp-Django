@@ -7,14 +7,8 @@ const DRAWER_WIDTH = 240;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        <ThemeRegistry>
-          <NextAuthWrapper>
-            {children}
-          </NextAuthWrapper>
-        </ThemeRegistry>
-      </body>
-    </html>
+    <>
+      {children}
+    </>
   );
 }

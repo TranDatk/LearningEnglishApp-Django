@@ -1,10 +1,10 @@
 import NextAuth from "next-auth"
-import GithubodyObjectProvider from "next-auth/providers/github"
+import GithubProvider from "next-auth/providers/github"
 import { AuthOptions } from "next-auth"
 import { sendRequest } from "@/utils/api"
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const bodyObjectACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60;  
+const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60;  
 
 const getCurrentEpochTime = () => {
   return Math.floor(new Date().getTime() / 1000);
@@ -14,15 +14,10 @@ export const authOptions : AuthOptions = {
   secret: process.env.NO_SECRET,
   providers: [
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. "Sign in with...")
       name: "Credentials",
-      // `credentials` is used to generate a form on the sign in page.
-      // You can specify which fields should bodyObjecte subodyObjectmitted, bodyObjecty adding keys to the `credentials` obodyObjectject.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribodyObjectute to the <input> tag through the obodyObjectject.
       credentials: {
-        username: { labodyObjectel: "Username", type: "text" },
-        password: { labodyObjectel: "Password", type: "password" }
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
       },
      
       async authorize(credentials, req) {
@@ -41,35 +36,38 @@ export const authOptions : AuthOptions = {
         });
         const res = await response.json();
         console.log(res)
-        if (res) {
-
+        if (!res.error) {
           return res as any
         } else {
-
-          return null
-  
-          // You can also Reject this callbodyObjectack with an Error thus the user will bodyObjecte sent to the error page with the error message as a query parameter
+          throw new Error(res.error)
         }
       }
     }),
-    GithubodyObjectProvider({
-      clientId: process.env.GITHUbodyObject_ID!, 
-      clientSecret: process.env.GITHUbodyObject_SECRET!,
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!, 
+      clientSecret: process.env.GITHUB_SECRET!,
     }),
   ],
   callbacks:{
     async jwt({token,user,account,profile,trigger}){
-      if(trigger ==="signIn" && account?.provider === "githubodyObject"){
+      if(trigger ==="signIn" && account?.provider !== "credentials"){
         const res = await sendRequest<backendResponse>({
-          url: "http://127.0.0.1:8000/githubodyObject/",
+          url: "http://127.0.0.1:8000/github/",
           method: "POST",
-          body: { access_token: account["access_token"] }
+          body: { access_token: account?.access_token }
         })
        if(res){
         token.user = res.user;
         token.access_token = res.access;
         token.refresh_token = res.refresh;
        }
+      }else if(trigger ==="signIn" && account?.provider === "credentials"){
+        //@ts-ignore
+        token.user = user.user;
+          //@ts-ignore
+        token.access_token = user.access_token;
+          //@ts-ignore
+        token.refresh_token = user.refresh_token;
       }
       return token;
     },
@@ -81,6 +79,9 @@ export const authOptions : AuthOptions = {
       }
       return session;
     }
+  },
+  pages:{
+    signIn:"/auth/signin"
   }
 }
 

@@ -36,6 +36,7 @@ class CustomTokenView(TokenView):
                     'id': token.user.id,
                     'username': token.user.username,
                     'email': token.user.email,
+                    'avatar': token.user.avatar.name
                 }
                 body = json.dumps(body)
         response = HttpResponse(content=body, status=status)

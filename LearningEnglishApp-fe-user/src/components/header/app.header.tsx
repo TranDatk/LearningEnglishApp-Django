@@ -65,6 +65,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
     const { data: session } = useSession()
+    console.log(session)
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const router = useRouter();
@@ -228,8 +229,7 @@ export default function AppHeader() {
                                     <Avatar
                                         onClick={handleProfileMenuOpen}>H</Avatar>
                                 </> :
-                                    <Link href={"#"}
-                                        onClick={() => signIn()}>Login</Link>
+                                    <Link href={"auth/signin"}>Login</Link>
                             }
 
                         </Box>
