@@ -11,7 +11,7 @@ const getCurrentEpochTime = () => {
 };
 
 export const authOptions : AuthOptions = {
-  secret: process.env.NO_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Credentials",
