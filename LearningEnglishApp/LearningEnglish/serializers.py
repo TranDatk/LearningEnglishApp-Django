@@ -73,46 +73,30 @@ class ProcessSerializer(ModelSerializer):
         model = Process
         fields = ["id", "progress", "fk_user", "fk_course", "created_date", "updated_date", "is_active"]
 
-class QuestionSerializer(ModelSerializer):
-    class Meta:
-        model = Question
-        fields = ["id","content", "created_date", "updated_date", "is_active", "correct_answer",
-                  "ft_answer", "sd_answer","td_answer","fh_answer","fk_lesson"]
-
 class GrammarSerializer(ModelSerializer):
     class Meta:
         model = Grammar
         fields = ["id", "name", "recipe","example","created_date", "updated_date", "is_active", "fk_title_grammar"]
 
-class CategorySerializer(ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["id", "name", "created_date", "updated_date", "is_active"]
-
 class WordSerializer(ModelSerializer):
     class Meta:
         model = Word
-        fields = ["id", "name", "means", "spelling", "sound", "example" ,"created_date", "updated_date", "is_active"]
+        fields = ["id", "name", "means", "spelling", "sound", "example" ,"created_date", "updated_date", "is_active", "fk_lesson"]
 
 class ReadingSerializer(ModelSerializer):
     class Meta:
         model = Reading
-        fields = ["id", "name", "created_date", "updated_date", "is_active", "paragraph"]
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "paragraph", "fk_lesson"]
 
 class ListeningSerializer(ModelSerializer):
     class Meta:
-        model = Listen
-        fields = ["id", "name", "created_date", "updated_date", "is_active", "sound"]
+        model = Listening
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "sound", "fk_lesson"]
 
 class TitleGrammarSerializer(ModelSerializer):
     class Meta:
         model = TitleGrammar
-        fields = ["id", "name", "created_date", "updated_date", "is_active"]
-
-class Lesson_Category_WLRGSerializer(ModelSerializer):
-    class Meta:
-        model = Lesson_Category_WLRG
-        fields = ["id", "created_date", "updated_date", "is_active", "id_WLRG", "fk_lesson", "fk_category"]
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
 
 class ProcessSerializer(ModelSerializer):
     class Meta:
@@ -133,3 +117,20 @@ class RankingSerializer(ModelSerializer):
     class Meta:
         model = Ranking
         fields = ["id", "created_date", "updated_date", "is_active", "score", "id_user", "name"]
+
+class QuestionListeningSerializer(ModelSerializer):
+    class Meta:
+        model = QuestionListening
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "correct_answer","content", "fk_listening"]
+
+class QuestionReadingSerializer(ModelSerializer):
+    class Meta:
+        model = QuestionReading
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "correct_answer","content", "ft_answer",
+            "sd_answer","td_answer","fh_answer","fk_reading"]
+
+class QuestionGrammarSerializer(ModelSerializer):
+    class Meta:
+        model = QuestionGrammar
+        fields = ["id", "name", "created_date", "updated_date", "is_active", "correct_answer","content", "ft_answer",
+            "sd_answer","td_answer","fh_answer","fk_titlegrammar"]

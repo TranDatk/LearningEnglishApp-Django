@@ -19,7 +19,7 @@ const AppFooter = () => {
                 <AudioPlayer
                     autoPlay={true}
                     src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
-                    onPlay={e => console.log("onPlay")}
+                    onPlay={() => { }}
                     style={{
                         boxShadow: "unset",
                         background: "#f2f2f2"

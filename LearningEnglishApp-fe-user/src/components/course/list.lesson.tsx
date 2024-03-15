@@ -1,56 +1,99 @@
 'use client'
-import ListSubheader from '@mui/material/ListSubheader';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Collapse from '@mui/material/Collapse';
-import StarBorder from '@mui/icons-material/StarBorder';
 import * as React from 'react';
-import SendIcon from '@mui/icons-material/Send';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
+import { styled } from '@mui/material/styles';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
+import MuiAccordionSummary, {
+    AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
 
-const ListLesson = () => {
-    const [open, setOpen] = React.useState(true);
+interface IProps {
+    lesson: ILesson[];
+}
 
-    const handleClick = () => {
-        setOpen(!open);
+const Accordion = styled((props: AccordionProps) => (
+    <MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    '&:not(:last-child)': {
+        borderBottom: 0,
+    },
+    '&::before': {
+        display: 'none',
+    },
+}));
+
+
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+    <MuiAccordionSummary
+        expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+        {...props}
+    />
+))(({ theme }) => ({
+    backgroundColor:
+        theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, .05)'
+            : 'rgba(0, 0, 0, .03)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+        transform: 'rotate(90deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+        marginLeft: theme.spacing(1),
+    },
+}));
+
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+    padding: theme.spacing(2),
+    borderTop: '1px solid rgba(0, 0, 0, .125)',
+}));
+
+const ListLesson = (props: IProps) => {
+    const [expanded, setExpanded] = React.useState(false);
+
+
+    const handleExpansion = () => {
+        setExpanded((prevExpanded) => !prevExpanded);
     };
 
     return (
-        <List
-            sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
-                    Nội dung khóa học
-                </ListSubheader>
-            }
-        >
-            <ListItemButton>
-                <ListItemText primary="Sent mail" />
-            </ListItemButton>
-            <ListItemButton onClick={handleClick}>
-                <ListItemIcon>
-                    <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Inbox" />
-                {open ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                            <StarBorder />
-                        </ListItemIcon>
-                        <ListItemText primary="Starred" />
-                    </ListItemButton>
-                </List>
-            </Collapse>
-        </List>
+        <div>
+            {Array.isArray(props?.lesson) && props?.lesson.map(lesson => {
+                return (
+                    <Accordion id={lesson?.id.toString()}>
+                        <AccordionSummary
+                            aria-controls={`panel-${lesson?.id}-content`}
+                            id={`panel-${lesson?.id}-header`}>
+                            <Typography>
+                                {lesson?.name}
+                            </Typography>
+                            <Typography sx={{ ml: 'auto' }}>
+                                {props.lesson.length - 1}
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <blockquote style={{
+                                borderLeft: "4px solid rgb(206, 208, 212)",
+                                paddingLeft: "10px"
+                            }}>
+                                {lesson?.description}
+                            </blockquote>
+                            <Typography>
+                                Lorem
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                )
+            })}
+
+
+
+        </div >
     );
 }
 

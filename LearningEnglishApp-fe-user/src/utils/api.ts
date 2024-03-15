@@ -1,4 +1,5 @@
 import queryString from 'query-string';
+import slugify from 'slugify';
 
 export const sendRequest = async <T>(props: IRequest) => {
     let {
@@ -39,3 +40,23 @@ export const sendRequest = async <T>(props: IRequest) => {
         }
     });
 };
+
+export const convertSlugUrl = (str: string): string => {
+    if(!str) return "";
+    str=slugify(str, { 
+        lower:true,
+        locale: 'vi',
+    })
+    return str;
+}
+
+export function getIdFromUrl(url: string): string{
+    if(url){
+        const temp = url.split('.html');
+        const nameAndId = temp[0].split('-');
+        const id = nameAndId[nameAndId.length - 1];
+        return id;
+    }
+   else
+        return ""
+}

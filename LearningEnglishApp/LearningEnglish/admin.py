@@ -5,15 +5,10 @@ from django.db.models import Count
 from django.template.response import TemplateResponse
 from django.utils.html import mark_safe
 from django.urls import path
-from .models import Category, Course, Lesson, Tag, Word, Reading, Question, Grammar, \
-    Listen, Lesson_Category_WLRG, TitleGrammar, Process, Ranking, Friends, Score, User
+from .models import Course, Lesson, Tag, Word, Reading, Grammar, TitleGrammar, Process, Ranking, Friends, Score, User, \
+    Listening, QuestionReading, QuestionListening, QuestionGrammar
 from django.contrib.auth.models import Permission, Group
 
-class QuestionForm(forms.ModelForm):
-    content = forms.CharField(widget=CKEditorUploadingWidget)
-    class Meta:
-        model = Question
-        fields = '__all__'
 
 class ReadingForm(forms.ModelForm):
     paragraph = forms.CharField(widget=CKEditorUploadingWidget)
@@ -26,11 +21,6 @@ class GrammarForm(forms.ModelForm):
     class Meta:
         model = Grammar
         fields = '__all__'
-
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "created_date", "updated_date", "is_active"]
-    search_fields = ["id", "name", "created_date", "updated_date"]
-    list_filter = ["name", "created_date", "updated_date"]
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active","description", "image"]
@@ -62,15 +52,9 @@ class WordAdmin(admin.ModelAdmin):
 
 class ReadingAdmin(admin.ModelAdmin):
     form = ReadingForm
-    list_display = ["id", "name", "created_date", "updated_date", "is_active"]
+    list_display = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
     search_fields = ["id", "name", "created_date", "updated_date"]
     list_filter = ["name", "created_date", "updated_date"]
-
-class QuestionAdmin(admin.ModelAdmin):
-    form = QuestionForm
-    list_display = ["id", "content", "created_date", "updated_date", "is_active", "correct_answer", "fk_lesson"]
-    search_fields = ["id", "content", "created_date", "updated_date"]
-    list_filter = ["content", "created_date", "updated_date"]
 
 class GrammarAdmin(admin.ModelAdmin):
     form = GrammarForm
@@ -78,16 +62,32 @@ class GrammarAdmin(admin.ModelAdmin):
     search_fields = ["id", "name", "created_date", "updated_date"]
     list_filter = ["name", "created_date", "updated_date"]
 
-class ListenAdmin(admin.ModelAdmin):
+class ListeningAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
+    search_fields = ["id", "name", "created_date", "updated_date"]
+    list_filter = ["name", "created_date", "updated_date"]
+
+class ListeningAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
+    search_fields = ["id", "name", "created_date", "updated_date"]
+    list_filter = ["name", "created_date", "updated_date"]
+
+class TitleGrammarAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
+    search_fields = ["id", "name", "created_date", "updated_date"]
+    list_filter = ["name", "created_date", "updated_date"]
+
+class QuestionGrammarAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active"]
     search_fields = ["id", "name", "created_date", "updated_date"]
     list_filter = ["name", "created_date", "updated_date"]
 
-class Lesson_Category_WLRGAdmin(admin.ModelAdmin):
-    list_display = ["id", "id_WLRG", "fk_lesson", "fk_category"]
-    search_fields = ["id", "id_WLRG", "fk_lesson", "fk_category"]
+class QuestionListeningAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "created_date", "updated_date", "is_active"]
+    search_fields = ["id", "name", "created_date", "updated_date"]
+    list_filter = ["name", "created_date", "updated_date"]
 
-class TitleGrammarAdmin(admin.ModelAdmin):
+class QuestionReadingAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "created_date", "updated_date", "is_active"]
     search_fields = ["id", "name", "created_date", "updated_date"]
     list_filter = ["name", "created_date", "updated_date"]
@@ -146,21 +146,21 @@ class LearningEnglishAppAdminSite(admin.AdminSite):
 admin_site = LearningEnglishAppAdminSite('LearningEnglish')
 
 admin_site.register(User, UserAdmin)
-admin_site.register(Category, CategoryAdmin)
 admin_site.register(Course, CourseAdmin)
 admin_site.register(Lesson, LessonAdmin)
 admin_site.register(Tag, TagAdmin)
 admin_site.register(Word, WordAdmin)
 admin_site.register(Reading, ReadingAdmin)
-admin_site.register(Question, QuestionAdmin)
 admin_site.register(Grammar, GrammarAdmin)
-admin_site.register(Listen, ListenAdmin)
-admin_site.register(Lesson_Category_WLRG, Lesson_Category_WLRGAdmin)
+admin_site.register(Listening, ListeningAdmin)
 admin_site.register(Process, ProcessAdmin)
 admin_site.register(Score, ScoreAdmin)
 admin_site.register(Ranking, RankingAdmin)
 admin_site.register(Friends, FriendsAdmin)
 admin_site.register(TitleGrammar, TitleGrammarAdmin)
+admin_site.register(QuestionReading, QuestionReadingAdmin)
+admin_site.register(QuestionListening, QuestionListeningAdmin)
+admin_site.register(QuestionGrammar, QuestionGrammarAdmin)
 
 admin_site.register(Permission)
 admin_site.register(Group)

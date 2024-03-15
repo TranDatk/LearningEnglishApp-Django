@@ -7,16 +7,6 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
     email = models.CharField(max_length=255, null=False, unique=True)
 
-    # def save(self, *args, **kwargs):
-    #     super(User, self).save(*args, **kwargs)
-    #
-    #     avatar = Image.open(self.avatar.path)
-    #
-    #     if avatar.height > 300 or avatar.width > 300:
-    #         output_size = (300, 300)
-    #         avatar.thumbnail(output_size)
-    #         avatar.save(self.avatar.path)
-
 class ItemBase(models.Model):
     class Meta:
         abstract = True
@@ -25,6 +15,19 @@ class ItemBase(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class QuestionBase(models.Model):
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=255, null=True, unique=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    correct_answer = models.CharField(max_length=5, null=True, unique=False)
 
     def __str__(self):
         return self.name
@@ -89,27 +92,31 @@ class Tag(ItemBase):
     def __str__(self):
         return self.name
 
-class Question(models.Model):
+class QuestionListening(QuestionBase):
     class Meta:
-        db_table = 'question'
+        db_table = 'question_listening'
+    content = RichTextField(null=False, blank=True)
+    fk_listening = models.ForeignKey('Listening', on_delete=models.SET_NULL, null=True, related_name="question_listening")
+
+class QuestionReading(QuestionBase):
+    class Meta:
+        db_table = 'question_reading'
     content = RichTextField(null=False, blank=True)
     ft_answer = models.CharField(max_length=255,null=True)
     sd_answer = models.CharField(max_length=255,null=True)
     td_answer = models.CharField(max_length=255, null=True)
     fh_answer = models.CharField(max_length=255,null=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    correct_answer = models.IntegerField(null=True)
-    fk_lesson = models.ForeignKey('Lesson', on_delete=models.SET_NULL, null=True, related_name="questions")
+    fk_reading = models.ForeignKey('Reading', on_delete=models.SET_NULL, null=True, related_name="question_reading")
 
-    def __str__(self):
-        return self.content
-
-class Category(ItemBase):
+class QuestionGrammar(QuestionBase):
     class Meta:
-        db_table = 'category'
-        ordering = ["created_date"]
+        db_table = 'question_grammar'
+    content = RichTextField(null=False, blank=True)
+    ft_answer = models.CharField(max_length=255,null=True)
+    sd_answer = models.CharField(max_length=255,null=True)
+    td_answer = models.CharField(max_length=255, null=True)
+    fh_answer = models.CharField(max_length=255,null=True)
+    fk_titlegrammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, related_name="question_grammar")
 
 class Course(ItemBase):
     class Meta:
@@ -135,39 +142,28 @@ class Word(ItemBase):
     spelling = models.CharField(max_length=255, null=True, blank=True, unique=True)
     sound = models.FileField(default=None, blank=True, null=True, upload_to='words_sound/%Y/%m')
     example = models.TextField(null=True, blank=True)
+    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True,related_name="word_lesson")
 
 class Grammar(ItemBase):
     class Meta:
         db_table = 'grammar'
     recipe = RichTextField(null=True, blank=True)
     example = models.TextField(null=True, blank=True)
-    fk_title_grammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, related_name="grammars")
+    fk_title_grammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, blank=True,related_name="grammars")
 
-class Listen(ItemBase):
+class Listening(ItemBase):
     class Meta:
-        db_table = 'listen'
+        db_table = 'listening'
     sound = models.FileField(default=None, blank=True, null=True, upload_to='listening_file/%Y/%m')
+    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL,null=True, blank=True, related_name="listening_lesson")
 
 class Reading(ItemBase):
     class Meta:
         db_table = 'reading'
     paragraph = RichTextField(null=True, blank=True)
+    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True,related_name="reading_lesson")
 
 class TitleGrammar(ItemBase):
     class Meta:
         db_table = 'titlegrammar'
-
-class Lesson_Category_WLRG(models.Model):
-    class Meta:
-        unique_together = ('id_WLRG','fk_lesson','fk_category')
-        db_table = 'lesson_category_wlrg'
-    id_WLRG = models.IntegerField(null=False)
-    fk_lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
-    fk_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lesson_category_wlrg")
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return "Id: " + str(self.id_WLRG) + " - Lesson: " + str(self.fk_lesson) \
-               + " - Category: " + str(self.fk_category)
+    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL,null=True, blank=True, related_name="titlegrammar_lesson")

@@ -8,6 +8,7 @@ import Divider from "@mui/material/Divider";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import Link from "next/link";
+import { convertSlugUrl } from "@/utils/api";
 
 interface IProps {
     results: ICourse[]
@@ -78,8 +79,8 @@ const MainSlider = (props: IProps) => {
                 {Array.isArray(results) && results.map(course => {
                     return (
                         <div className="course" key={course.id}>
-                            <Link href={`/course/${course?.id}`}>
-                                <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${course.image}`} alt="course" />
+                            <Link href={`/course/${convertSlugUrl(course?.name)}-${course?.id}.html?tag=${course?.tag[0]?.name}`}>
+                                <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${course?.image}`} alt="course" />
                                 <h4>{course.name}</h4>
                             </Link>
                         </div>

@@ -49,9 +49,31 @@ class GithubLogin(SocialLoginView):
     callback_url = "http://127.0.0.1:3000/"
     client_class = OAuth2Client
 
-class CourseViewSet(viewsets.ModelViewSet):
+class CourseViewSet(viewsets.ViewSet,
+                  generics.RetrieveAPIView,
+                    generics.ListAPIView):
     queryset = Course.objects.filter(is_active = True)
     serializer_class = CourseSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            response_data = {
+                'error': None,
+                'message': 'Success',
+                'statusCode': status.HTTP_200_OK,
+                'results': serializer.data,
+            }
+            return Response(data=response_data, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            response_data = {
+                'error': 'Không tìm thấy khóa học.',
+                'message': 'Not found',
+                'statusCode': status.HTTP_404_NOT_FOUND,
+                'results': None,
+            }
+            return Response(data=response_data, status=status.HTTP_404_NOT_FOUND)
 
     @action(methods=['post'], detail=True,
             url_path="hide-course",
@@ -95,14 +117,52 @@ class CourseViewSet(viewsets.ModelViewSet):
             }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-class LessonViewSet(viewsets.ModelViewSet):
+class LessonViewSet(viewsets.ViewSet,
+                  generics.RetrieveAPIView,
+                    generics.ListAPIView,):
     queryset = Lesson.objects.filter(is_active=True)
     serializer_class = LessonSerializer
 
     def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action == 'list' or self.action == 'retrieve' or self.action == 'search_by_course_id':
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
+    @action(methods=['get'], detail=False,
+            url_path="search-by-course/(?P<course_id>[^/.]+)",
+            url_name="search-by-course")
+    def search_by_course_id(self, request, course_id=None):
+        try:
+            course = get_object_or_404(Course, id=course_id)
+            queryset = Lesson.objects.filter(fk_courses=course)
+            serializer = LessonSerializer(queryset, many=True, context={'request': request})
+
+            response_data = {
+                'error': None,
+                'message': 'Success',
+                'statusCode': status.HTTP_200_OK,
+                'results': serializer.data,
+            }
+
+            return Response(data=response_data, status=status.HTTP_200_OK)
+
+        except Course.DoesNotExist:
+            response_data = {
+                'error': 'Không tìm thấy khóa học.',
+                'message': 'Not found',
+                'statusCode': status.HTTP_404_NOT_FOUND,
+                'results': None,
+            }
+            return Response(data=response_data, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            response_data = {
+                'error': str(e),
+                'message': 'Lỗi ' + str(e),
+                'statusCode': status.HTTP_400_BAD_REQUEST,
+                'results': None,
+            }
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True,
             url_path="hide-lesson",
@@ -197,27 +257,71 @@ class UserViewSet(viewsets.ViewSet,
         return Response(data=UserSerializer(u, context={'request': request}).data, status=status.HTTP_200_OK)
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.filter(is_active=True)
-    serializer_class = QuestionSerializer
+class QuestionListeningViewSet(viewsets.ModelViewSet):
+    queryset = QuestionListening.objects.filter(is_active=True)
+    serializer_class = QuestionListeningSerializer
 
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+    # def get_permissions(self):
+    #     if self.action == 'list' or self.action == 'retrieve':
+    #         return [permissions.AllowAny()]
+    #     return [permissions.IsAdminUser()]
 
     @action(methods=['post'], detail=True,
-            url_path="hide-question",
-            url_name="hide-question")
+            url_path="hide-question-listening",
+            url_name="hide-question-listening")
     def hide_question(self, request, pk):
         try:
-            q = Question.objects.get(pk=pk)
+            q = QuestionListening.objects.get(pk=pk)
             q.is_active = False
             q.save()
-        except Question.DoesNotExits:
+        except QuestionListening.DoesNotExits:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(data=QuestionSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
+        return Response(data=QuestionListeningSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
+
+class QuestionGrammarViewSet(viewsets.ModelViewSet):
+    queryset = QuestionGrammar.objects.filter(is_active=True)
+    serializer_class = QuestionGrammarSerializer
+
+    # def get_permissions(self):
+    #     if self.action == 'list' or self.action == 'retrieve':
+    #         return [permissions.AllowAny()]
+    #     return [permissions.IsAdminUser()]
+
+    @action(methods=['post'], detail=True,
+            url_path="hide-question-grammar",
+            url_name="hide-question-grammar")
+    def hide_question(self, request, pk):
+        try:
+            q = QuestionGrammar.objects.get(pk=pk)
+            q.is_active = False
+            q.save()
+        except QuestionGrammar.DoesNotExits:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=QuestionGrammarSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
+
+class QuestionReadingViewSet(viewsets.ModelViewSet):
+    queryset = QuestionReading.objects.filter(is_active=True)
+    serializer_class = QuestionReadingSerializer
+
+    # def get_permissions(self):
+    #     if self.action == 'list' or self.action == 'retrieve':
+    #         return [permissions.AllowAny()]
+    #     return [permissions.IsAdminUser()]
+
+    @action(methods=['post'], detail=True,
+            url_path="hide-question-reading",
+            url_name="hide-question-reading")
+    def hide_question(self, request, pk):
+        try:
+            q = QuestionReading.objects.get(pk=pk)
+            q.is_active = False
+            q.save()
+        except QuestionReading.DoesNotExits:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=QuestionReadingSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
 
 class GrammarViewSet(viewsets.ModelViewSet):
     queryset = Grammar.objects.filter(is_active=True)
@@ -241,28 +345,6 @@ class GrammarViewSet(viewsets.ModelViewSet):
 
         return Response(data=GrammarSerializer(g, context={'request': request}).data, status=status.HTTP_200_OK)
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.filter(is_active=True)
-    serializer_class = CategorySerializer
-    pagination_class = None
-
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
-
-    @action(methods=['post'], detail=True,
-            url_path="hide-category",
-            url_name="hide-category")
-    def hide_category(self, request, pk):
-        try:
-            c = Category.objects.get(pk=pk)
-            c.is_active = False
-            c.save()
-        except Category.DoesNotExits:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=CategorySerializer(c, context={'request': request}).data, status=status.HTTP_200_OK)
 
 class WordViewSet(viewsets.ModelViewSet):
     queryset = Word.objects.filter(is_active=True)
@@ -309,7 +391,7 @@ class ReadingViewSet(viewsets.ModelViewSet):
         return Response(data=ReadingSerializer(r, context={'request': request}).data, status=status.HTTP_200_OK)
 
 class ListeningViewSet(viewsets.ModelViewSet):
-    queryset = Listen.objects.filter(is_active=True)
+    queryset = Listening.objects.filter(is_active=True)
     serializer_class = ListeningSerializer
 
     def get_permissions(self):
@@ -322,10 +404,10 @@ class ListeningViewSet(viewsets.ModelViewSet):
             url_name="hide-listening")
     def hide_listening(self, request, pk):
         try:
-            l = Listen.objects.get(pk=pk)
+            l = Listening.objects.get(pk=pk)
             l.is_active = False
             l.save()
-        except Listen.DoesNotExits:
+        except Listening.DoesNotExits:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data=ListeningSerializer(l, context={'request': request}).data, status=status.HTTP_200_OK)
@@ -352,27 +434,6 @@ class TitleGrammarViewSet(viewsets.ModelViewSet):
 
         return Response(data=TitleGrammarSerializer(tg, context={'request': request}).data, status=status.HTTP_200_OK)
 
-class Lesson_Category_WLRGViewSet(viewsets.ModelViewSet):
-    queryset = Lesson_Category_WLRG.objects.filter(is_active=True)
-    serializer_class = Lesson_Category_WLRGSerializer
-
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
-
-    @action(methods=['post'], detail=True,
-            url_path="hide-wlrg",
-            url_name="hide-wlrg")
-    def hide_lesson_category_wlrg(self, request, pk):
-        try:
-            wlrg = Lesson_Category_WLRG.objects.get(pk=pk)
-            wlrg.is_active = False
-            wlrg.save()
-        except Lesson_Category_WLRG.DoesNotExits:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=Lesson_Category_WLRGSerializer(wlrg, context={'request': request}).data, status=status.HTTP_200_OK)
 
 class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.filter(is_active=True)

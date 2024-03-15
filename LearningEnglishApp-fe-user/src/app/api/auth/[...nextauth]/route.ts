@@ -35,7 +35,6 @@ export const authOptions : AuthOptions = {
           body: bodyObject.toString(),
         });
         const res = await response.json();
-        console.log(res)
         if (!res.error) {
           return res as any
         } else {

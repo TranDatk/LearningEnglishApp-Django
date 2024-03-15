@@ -7,6 +7,17 @@ declare global {
         name: string;
     }
 
+    interface ILesson{
+        "id": number;
+        "name": string;
+        "created_date": string;
+        "updated_date":string;
+        "is_active": boolean;
+        "index": number;
+        "description": string;
+        "fk_course":string;
+    }
+
     interface backendResponse{
         access : string;
         refresh : string;
@@ -49,4 +60,8 @@ declare global {
         result: T[]
     }
 
+    interface ICourseContext{
+        currentCourse: ICourse;
+        setCurrentCourse: (course: ICourse) => void;
+    }
 }
