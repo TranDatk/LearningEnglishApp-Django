@@ -15,6 +15,7 @@ import ListLesson from '@/components/course/list.lesson';
 import { Container } from "@mui/material";
 import MainContentCourse from '@/components/course/main.content.course';
 import { getIdFromUrl, sendRequest } from '@/utils/api';
+import CourseDescription from '@/components/course/course.description';
 
 const DetailCoursePage = async ({ params }: { params: { slug: string } }) => {
 
@@ -28,11 +29,15 @@ const DetailCoursePage = async ({ params }: { params: { slug: string } }) => {
         method: 'GET',
         // headers: { 'Authorization': `Bearer ${session?.access_token}` },
     })
+    console.log(resCourse?.results != undefined && resCourse?.results?.description)
 
     return (
         <>
             <MainContentCourse course={resCourse?.results!} />
-            <ListLesson lesson={resLesson?.results ?? []} />
+            <Container>
+                <ListLesson lesson={resLesson?.results ?? []} />
+                <CourseDescription description={resCourse?.results != undefined && resCourse?.results?.description} />
+            </Container>
         </>
     )
 }

@@ -134,14 +134,34 @@ class LessonViewSet(viewsets.ViewSet,
     def search_by_course_id(self, request, course_id=None):
         try:
             course = get_object_or_404(Course, id=course_id)
-            queryset = Lesson.objects.filter(fk_courses=course)
-            serializer = LessonSerializer(queryset, many=True, context={'request': request})
+            queryset = Lesson.objects.filter(fk_courses=course).order_by('index')
+
+            data = []
+            for lesson in queryset:
+                lesson_data = {
+                    'id': lesson.pk,
+                    'name': lesson.name,
+                    'description': lesson.description,
+                    'type': lesson.type,
+                    'fk_course': lesson.fk_courses.id,
+                    'reading': [],
+                    'listening': []
+                }
+                if lesson.type == 'reading':
+                    reading_queryset = Reading.objects.filter(fk_lesson=lesson.pk)
+                    reading_serializer = ReadingSerializer(reading_queryset, many=True)
+                    lesson_data['reading'] = reading_serializer.data
+                elif lesson.type == 'listening':
+                    listening_queryset = Listening.objects.filter(fk_lesson=lesson.pk)
+                    listening_serializer = ListeningSerializer(listening_queryset, many=True)
+                    lesson_data['listening'] = listening_serializer.data
+                data.append(lesson_data)
 
             response_data = {
                 'error': None,
                 'message': 'Success',
                 'statusCode': status.HTTP_200_OK,
-                'results': serializer.data,
+                'results': data,
             }
 
             return Response(data=response_data, status=status.HTTP_200_OK)
@@ -279,28 +299,6 @@ class QuestionListeningViewSet(viewsets.ModelViewSet):
 
         return Response(data=QuestionListeningSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
 
-class QuestionGrammarViewSet(viewsets.ModelViewSet):
-    queryset = QuestionGrammar.objects.filter(is_active=True)
-    serializer_class = QuestionGrammarSerializer
-
-    # def get_permissions(self):
-    #     if self.action == 'list' or self.action == 'retrieve':
-    #         return [permissions.AllowAny()]
-    #     return [permissions.IsAdminUser()]
-
-    @action(methods=['post'], detail=True,
-            url_path="hide-question-grammar",
-            url_name="hide-question-grammar")
-    def hide_question(self, request, pk):
-        try:
-            q = QuestionGrammar.objects.get(pk=pk)
-            q.is_active = False
-            q.save()
-        except QuestionGrammar.DoesNotExits:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=QuestionGrammarSerializer(q, context={'request': request}).data, status=status.HTTP_200_OK)
-
 class QuestionReadingViewSet(viewsets.ModelViewSet):
     queryset = QuestionReading.objects.filter(is_active=True)
     serializer_class = QuestionReadingSerializer
@@ -345,29 +343,6 @@ class GrammarViewSet(viewsets.ModelViewSet):
 
         return Response(data=GrammarSerializer(g, context={'request': request}).data, status=status.HTTP_200_OK)
 
-
-class WordViewSet(viewsets.ModelViewSet):
-    queryset = Word.objects.filter(is_active=True)
-    serializer_class = WordSerializer
-
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
-
-    @action(methods=['post'], detail=True,
-            url_path="hide-word",
-            url_name="hide-word")
-    def hide_word(self, request, pk):
-        try:
-            w = Word.objects.get(pk=pk)
-            w.is_active = False
-            w.save()
-        except Word.DoesNotExits:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=WordSerializer(w, context={'request': request}).data, status=status.HTTP_200_OK)
-
 class ReadingViewSet(viewsets.ModelViewSet):
     queryset = Reading.objects.filter(is_active=True)
     serializer_class = ReadingSerializer
@@ -411,28 +386,6 @@ class ListeningViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data=ListeningSerializer(l, context={'request': request}).data, status=status.HTTP_200_OK)
-
-class TitleGrammarViewSet(viewsets.ModelViewSet):
-    queryset = TitleGrammar.objects.filter(is_active=True)
-    serializer_class = TitleGrammarSerializer
-
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'retrieve':
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
-
-    @action(methods=['post'], detail=True,
-            url_path="hide-titlegrammar",
-            url_name="hide-titlegrammar")
-    def hide_titlegrammar(self, request, pk):
-        try:
-            tg = TitleGrammar.objects.get(pk=pk)
-            tg.is_active = False
-            tg.save()
-        except TitleGrammar.DoesNotExits:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=TitleGrammarSerializer(tg, context={'request': request}).data, status=status.HTTP_200_OK)
 
 
 class ProcessViewSet(viewsets.ModelViewSet):

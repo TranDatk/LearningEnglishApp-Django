@@ -5,8 +5,8 @@ from django.db.models import Count
 from django.template.response import TemplateResponse
 from django.utils.html import mark_safe
 from django.urls import path
-from .models import Course, Lesson, Tag, Word, Reading, Grammar, TitleGrammar, Process, Ranking, Friends, Score, User, \
-    Listening, QuestionReading, QuestionListening, QuestionGrammar
+from .models import Course, Lesson, Tag, Reading, Grammar, Process, Ranking, Friends, Score, User, \
+    Listening, QuestionReading, QuestionListening
 from django.contrib.auth.models import Permission, Group
 
 
@@ -149,7 +149,6 @@ admin_site.register(User, UserAdmin)
 admin_site.register(Course, CourseAdmin)
 admin_site.register(Lesson, LessonAdmin)
 admin_site.register(Tag, TagAdmin)
-admin_site.register(Word, WordAdmin)
 admin_site.register(Reading, ReadingAdmin)
 admin_site.register(Grammar, GrammarAdmin)
 admin_site.register(Listening, ListeningAdmin)
@@ -157,10 +156,8 @@ admin_site.register(Process, ProcessAdmin)
 admin_site.register(Score, ScoreAdmin)
 admin_site.register(Ranking, RankingAdmin)
 admin_site.register(Friends, FriendsAdmin)
-admin_site.register(TitleGrammar, TitleGrammarAdmin)
 admin_site.register(QuestionReading, QuestionReadingAdmin)
 admin_site.register(QuestionListening, QuestionListeningAdmin)
-admin_site.register(QuestionGrammar, QuestionGrammarAdmin)
 
 admin_site.register(Permission)
 admin_site.register(Group)

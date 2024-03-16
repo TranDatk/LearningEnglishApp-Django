@@ -7,15 +7,29 @@ declare global {
         name: string;
     }
 
-    interface ILesson{
-        "id": number;
-        "name": string;
-        "created_date": string;
-        "updated_date":string;
-        "is_active": boolean;
-        "index": number;
-        "description": string;
-        "fk_course":string;
+    interface Itembase{
+        id: number;
+        name: string;
+        created_date: string;
+        updated_date:string;
+        is_active: boolean;
+    }
+
+    interface IListening extends Itembase{
+        sound: string;
+        fk_lesson: string;
+    }
+
+    interface IReading extends Itembase{
+        paragraph: string;
+        fk_lesson: string;
+    }
+
+    interface ILesson extends Itembase{
+        description: string;
+        fk_course: number;
+        reading: IReading[];
+        listening: IListening[];
     }
 
     interface backendResponse{
@@ -24,13 +38,9 @@ declare global {
         user: IUser;
     }
 
-    interface ICourse {
-        "id": number;
-        "name": string;
-        "image": string;
-        "created_date": string;
-        "is_active": boolean;
-        "tag": ITag[];
+    interface ICourse extends Itembase{
+        tag: ITag[];
+        description: React.ReactNode;
     }
 
     interface IRequest {

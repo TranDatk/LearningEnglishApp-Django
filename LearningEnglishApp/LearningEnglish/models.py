@@ -108,22 +108,12 @@ class QuestionReading(QuestionBase):
     fh_answer = models.CharField(max_length=255,null=True)
     fk_reading = models.ForeignKey('Reading', on_delete=models.SET_NULL, null=True, related_name="question_reading")
 
-class QuestionGrammar(QuestionBase):
-    class Meta:
-        db_table = 'question_grammar'
-    content = RichTextField(null=False, blank=True)
-    ft_answer = models.CharField(max_length=255,null=True)
-    sd_answer = models.CharField(max_length=255,null=True)
-    td_answer = models.CharField(max_length=255, null=True)
-    fh_answer = models.CharField(max_length=255,null=True)
-    fk_titlegrammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, related_name="question_grammar")
-
 class Course(ItemBase):
     class Meta:
         db_table = 'course'
         ordering = ["created_date"]
     image = models.ImageField(upload_to='courses/%Y/%m', default=None)
-    description = models.TextField(null=True, blank=True)
+    description = RichTextField(null=True, blank=True)
     tag = models.ManyToManyField(Tag, related_name="tags",null=True, blank=True)
 
 class Lesson(ItemBase):
@@ -133,23 +123,14 @@ class Lesson(ItemBase):
         ordering = ["created_date"]
     index = models.IntegerField(null = False)
     description = models.TextField(null=True, blank=True)
+    type = models.CharField(null = True, blank=True, max_length=20)
     fk_courses = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
-
-class Word(ItemBase):
-    class Meta:
-        db_table = 'word'
-    means = models.CharField(max_length=255, null=True, blank=True, unique=True)
-    spelling = models.CharField(max_length=255, null=True, blank=True, unique=True)
-    sound = models.FileField(default=None, blank=True, null=True, upload_to='words_sound/%Y/%m')
-    example = models.TextField(null=True, blank=True)
-    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True,related_name="word_lesson")
 
 class Grammar(ItemBase):
     class Meta:
         db_table = 'grammar'
     recipe = RichTextField(null=True, blank=True)
     example = models.TextField(null=True, blank=True)
-    fk_title_grammar = models.ForeignKey('TitleGrammar', on_delete=models.SET_NULL, null=True, blank=True,related_name="grammars")
 
 class Listening(ItemBase):
     class Meta:
@@ -163,7 +144,3 @@ class Reading(ItemBase):
     paragraph = RichTextField(null=True, blank=True)
     fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True,related_name="reading_lesson")
 
-class TitleGrammar(ItemBase):
-    class Meta:
-        db_table = 'titlegrammar'
-    fk_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL,null=True, blank=True, related_name="titlegrammar_lesson")

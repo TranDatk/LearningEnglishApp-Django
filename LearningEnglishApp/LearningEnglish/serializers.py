@@ -50,7 +50,7 @@ class CourseSerializer(ModelSerializer):
     tag = TagSerializer(many=True)
     class Meta:
         model = Course
-        fields = ["id", "name", "image", "created_date", "is_active", "tag"]
+        fields = ["id", "name", "image", "created_date", "is_active", "tag", "description",]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -76,12 +76,7 @@ class ProcessSerializer(ModelSerializer):
 class GrammarSerializer(ModelSerializer):
     class Meta:
         model = Grammar
-        fields = ["id", "name", "recipe","example","created_date", "updated_date", "is_active", "fk_title_grammar"]
-
-class WordSerializer(ModelSerializer):
-    class Meta:
-        model = Word
-        fields = ["id", "name", "means", "spelling", "sound", "example" ,"created_date", "updated_date", "is_active", "fk_lesson"]
+        fields = ["id", "name", "recipe","example","created_date", "updated_date", "is_active"]
 
 class ReadingSerializer(ModelSerializer):
     class Meta:
@@ -92,11 +87,6 @@ class ListeningSerializer(ModelSerializer):
     class Meta:
         model = Listening
         fields = ["id", "name", "created_date", "updated_date", "is_active", "sound", "fk_lesson"]
-
-class TitleGrammarSerializer(ModelSerializer):
-    class Meta:
-        model = TitleGrammar
-        fields = ["id", "name", "created_date", "updated_date", "is_active", "fk_lesson"]
 
 class ProcessSerializer(ModelSerializer):
     class Meta:
@@ -128,9 +118,3 @@ class QuestionReadingSerializer(ModelSerializer):
         model = QuestionReading
         fields = ["id", "name", "created_date", "updated_date", "is_active", "correct_answer","content", "ft_answer",
             "sd_answer","td_answer","fh_answer","fk_reading"]
-
-class QuestionGrammarSerializer(ModelSerializer):
-    class Meta:
-        model = QuestionGrammar
-        fields = ["id", "name", "created_date", "updated_date", "is_active", "correct_answer","content", "ft_answer",
-            "sd_answer","td_answer","fh_answer","fk_titlegrammar"]
