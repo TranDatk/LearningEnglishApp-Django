@@ -1,19 +1,23 @@
-/** @type {import('next').NextConfig} */
+/**
+ * @format
+ * @type {import('next').NextConfig}
+ */
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   modularizeImports: {
-    '@mui/icons-material': {
-      transform: '@mui/icons-material/{{member}}',
+    "@mui/icons-material": {
+      transform: "@mui/icons-material/{{member}}",
     },
   },
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'source.unsplash.com',
-        port: '',
-        pathname: '/random',
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "8000",
+        pathname: "/static/**",
       },
     ],
   },

@@ -62,7 +62,7 @@ const ListLesson = (props: IProps) => {
     }, 0);
 
     return (
-        <div>
+        <Box>
             <Box>
                 <h2 style={{ marginBlockStart: "0.5em", marginBlockEnd: "0.5em" }}>Nội dung khóa học</h2>
                 <div style={{ display: "flex", gap: "0.5em", marginBlockEnd: "0.5em", fontWeight: "400", fontSize: "1rem" }}>
@@ -117,7 +117,7 @@ const ListLesson = (props: IProps) => {
                     )
                 })
             }
-        </div >
+        </Box>
     );
 }
 

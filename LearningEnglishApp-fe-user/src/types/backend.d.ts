@@ -40,7 +40,8 @@ declare global {
 
     interface ICourse extends Itembase{
         tag: ITag[];
-        description: React.ReactNode;
+        description: string;
+        image: string;
     }
 
     interface IRequest {
